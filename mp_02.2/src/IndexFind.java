@@ -3,8 +3,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 /**
- * <h3>Problem 2.</h3> 
- * Let T[0,...,n-1] be a sorted array of integers, some of
+ * <h3>Problem 2.</h3> Let T[0,...,n-1] be a sorted array of integers, some of
  * which may be negative but all of which are different. Give an algorithm that
  * is able to find an index i such that 0≤i≤n-1 and T[i]=i, provided such an
  * index exists. Your algorithm should take a time in O(log n) in the worst
@@ -24,61 +23,85 @@ public class IndexFind {
 	 */
 	private static int index;
 	/**
-	 * assistant variable 
+	 * assistant variable
 	 */
 	private static boolean indexFound;
 
 	public static void main(String[] args) {
-		
+
 		int size = 50000;
 		int trials = 50;
-		long[] times = new long[trials];
-
+		long[] timesNaive = new long[trials];
+		long[] timesFast = new long[trials];
 		
 		do {
 			trials--;
 			T = doArray(size);
 			long start;
 			long stop;
-			
+
 			Arrays.sort(T);
 			// for (Integer i : T) {
 			// System.out.print(i + " ");
 			// }
 
-	
+			
+			// start naive method //
+			start = System.nanoTime();
+			indexFound = false;
+			int i = 0;
+			while (i < size && !indexFound) {
+				if (T[i] == i)
+					indexFound = true;
+				i++;
+			}
+			stop = System.nanoTime();
+
+			timesNaive[trials] = stop - start;
+			if (indexFound)
+				System.out.println("Time: " + timesNaive[trials] + " nanoseconds");
+			else
+				System.out.println("\nIndex not found");
+
+			// start fast method //
 			start = System.nanoTime();
 			try {
 				find(T);
 				System.out.println("\nIndex is " + index + "");
-				
+
 			} catch (Exception e) {
 				System.out.println("\nIndex not found");
-			} 
+			}
 			stop = System.nanoTime();
-			
 
-			times[trials] = stop - start;
-			System.out.println("Time: " + times[trials] + " nanoseconds");
+			timesFast[trials] = stop - start;
+			System.out.println("Time: " + timesFast[trials] + " nanoseconds");
 
 		} while (0 != trials);
 
-		Arrays.sort(times);
-		long meanTime = times[times.length / 2];
-		System.out.println("\n---\nMean time: " + meanTime + " nanoseconds");
 		
+		//compiling results
+		Arrays.sort(timesNaive);
+		long meanTime2 = timesNaive[timesNaive.length / 2];
+		System.out.println("\n---\nMean time for naive: \t" + meanTime2 + " nanoseconds");
+		Arrays.sort(timesFast);
+		long meanTime = timesFast[timesFast.length / 2];
+		System.out.println("\nMean time for fast: \t" + meanTime + " nanoseconds");
+
 	}
 
 	/**
-	 * Finding an index with use of recurrence to implement 
+	 * Finding an index with use of recurrence to implement
 	 * <b><u>DEVIDE-AND-CONQUER strategy</u></b>
 	 * 
-	 * @param T input array
-	 * @throws Exception if no index was found
+	 * @param T
+	 *            input array
+	 * @throws Exception
+	 *             if no index was found
 	 */
 	public static void find(int[] T) throws Exception {
 		indexFound = false;
-		
+
 		if (T[0] > T.length || T[T.length - 1] < 0)
 			throw new Exception();
 
@@ -91,9 +114,12 @@ public class IndexFind {
 	/**
 	 * Recursive searching
 	 * 
-	 * @param L left boundary of a searched field in the array
-	 * @param R right boundary of a searched field in the array
-	 * @param T input array
+	 * @param L
+	 *            left boundary of a searched field in the array
+	 * @param R
+	 *            right boundary of a searched field in the array
+	 * @param T
+	 *            input array
 	 */
 	public static void search(int L, int R, int[] T) {
 		if (L >= R) {
