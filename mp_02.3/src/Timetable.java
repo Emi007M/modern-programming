@@ -27,7 +27,23 @@ public class Timetable {
 	public Timetable(int competitors) {
 		this.competitors = competitors;
 		setPairs();
-		orderDays();
+		
+		long start;
+		long stop;
+
+//		start = System.nanoTime();
+//		orderDays();
+//		stop = System.nanoTime();
+//		System.out.println("Time fast: \t" + (stop - start) + " nanoseconds");
+//		
+//		
+		
+		start = System.nanoTime();
+		orderDaysNaive();
+		stop = System.nanoTime();
+		System.out.println("Time naive: \t" + (stop - start) + " nanoseconds");
+		
+		
 	}
 
 	/**
@@ -158,6 +174,49 @@ public class Timetable {
 		b.bucket_pairs.addAll(b2.bucket_pairs);
 
 	}
+	
+	private void orderDaysNaive(){
+		Bucket allPairs = new Bucket();
+		for(int i = 0; i< unordered_pairs.length; i++)
+			allPairs.bucket_pairs.addAll(unordered_pairs[i].bucket_pairs);
+			
+		days = new Bucket[competitors - 1];
+		for (int i = 0; i < days.length; i++) {
+			days[i] = new Bucket();
+		}
+		int day = 0;
+		System.out.println("start!");
+		if(!orderDaysNaive(day, allPairs, days))
+			System.out.println("ERROR");
+		
+		
+	}
+	private static int max = 0;
+	private boolean orderDaysNaive(int i, Bucket all, Bucket[] days){
+		if(i>max) {
+			System.out.println(i + " out of " + all.bucket_pairs.size());
+			max = i;
+		}
+		if(i>=all.bucket_pairs.size())
+			return true;
+		boolean notSorted = true;
+		Pair tmp = all.bucket_pairs.get(i);
+		int j = 0;
+		
+		while(notSorted && j<days.length){
+			if(!days[j].containsCompetitor(tmp)){
+				days[j].add(tmp);
+				notSorted = !orderDaysNaive(i+1, all, days);
+				if(notSorted) 
+					days[j].bucket_pairs.remove(days[j].bucket_pairs.size()-1);
+			}
+			j++;
+		}
+		if(notSorted) return false;
+		return true;
+	}
+	
+	
 
 	@Override
 	public String toString() {
