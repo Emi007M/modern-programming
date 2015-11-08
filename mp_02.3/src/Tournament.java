@@ -16,6 +16,12 @@ public class Tournament {
 	private static int competitors;
 
 	public static void main(String[] args) {
+
+		/**
+		 * if false - uses divide and conquer strategy
+		 * if true - uses naive approach
+		 */
+		boolean naive = false;
 		
 		try {
 			setCompetitors(8);
@@ -24,7 +30,7 @@ public class Tournament {
 			return;
 		}
 		
-		Timetable timetable = new Timetable(competitors);
+		Timetable timetable = new Timetable(competitors, naive);
 		
 		System.out.println("--Timetable for "+competitors+" competitors--\n");
 		System.out.println(timetable);

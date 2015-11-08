@@ -13,9 +13,16 @@ public class Timetable {
 	private int competitors;
 
 	/**
-	 * <p>Set of <code>ArrayLists</code> containing <code>Pairs</code> of competitors</p>
-	 * <p>It holds all the possible combinations of competitors, i.e. C*(C-1)/2</p>
-	 * <p>Consists of C/2 Buckets</p>
+	 * <p>
+	 * Set of <code>ArrayLists</code> containing <code>Pairs</code> of
+	 * competitors
+	 * </p>
+	 * <p>
+	 * It holds all the possible combinations of competitors, i.e. C*(C-1)/2
+	 * </p>
+	 * <p>
+	 * Consists of C/2 Buckets
+	 * </p>
 	 */
 	private Bucket[] unordered_pairs;
 
@@ -24,38 +31,45 @@ public class Timetable {
 	 */
 	private Bucket[] days;
 
-	public Timetable(int competitors) {
+	public Timetable(int competitors, boolean naive) {
 		this.competitors = competitors;
 		setPairs();
-		
+
 		long start;
 		long stop;
 
-//		start = System.nanoTime();
-//		orderDays();
-//		stop = System.nanoTime();
-//		System.out.println("Time fast: \t" + (stop - start) + " nanoseconds");
-//		
-//		
-		
-		start = System.nanoTime();
-		orderDaysNaive();
-		stop = System.nanoTime();
-		System.out.println("Time naive: \t" + (stop - start) + " nanoseconds");
-		
-		
+		if (!naive) {
+			start = System.nanoTime();
+			orderDays();
+			stop = System.nanoTime();
+			System.out.println("Time fast: \t" + (stop - start) + " nanoseconds");
+		} else {
+			start = System.nanoTime();
+			orderDaysNaive();
+			stop = System.nanoTime();
+			System.out.println("Time naive: \t" + (stop - start) + " nanoseconds");
+		}
+
 	}
 
 	/**
-	 * <p>Generates all possible <code>Pairs</code> and puts it into 
-	 * <b>Bucket[] unordered_pairs</b></p>
-	 * <p>there are C/2 buckets - it is used to implement 
-	 * <b><u>@DEVIDE-AND-CONQUER strategy</u></b></p>
+	 * <p>
+	 * Generates all possible <code>Pairs</code> and puts it into <b>Bucket[]
+	 * unordered_pairs</b>
+	 * </p>
+	 * <p>
+	 * there are C/2 buckets - it is used to implement <b><u>@DEVIDE-AND-CONQUER
+	 * strategy</u></b>
+	 * </p>
 	 * 
-	 * <p>When Buckets are filled, each (beside the last one) contains 2 unsorted
-	 * sets of data i.e. has the information about 2 days of competitions</p>
+	 * <p>
+	 * When Buckets are filled, each (beside the last one) contains 2 unsorted
+	 * sets of data i.e. has the information about 2 days of competitions
+	 * </p>
 	 * 
-	 * <p>Last bucket already consists of a correct set of Pairs</p>
+	 * <p>
+	 * Last bucket already consists of a correct set of Pairs
+	 * </p>
 	 */
 	private void setPairs() {
 
@@ -82,11 +96,15 @@ public class Timetable {
 	}
 
 	/**
-	 * <p>Uses <b>Bucket[] unordered_pairs</b> as a data set to create correct daily schedules
-	 * it takes each Bucket and divides it properly into 2 days of competitions
-	 * the last Bucket is being rewritten</p>
+	 * <p>
+	 * Uses <b>Bucket[] unordered_pairs</b> as a data set to create correct
+	 * daily schedules it takes each Bucket and divides it properly into 2 days
+	 * of competitions the last Bucket is being rewritten
+	 * </p>
 	 * 
-	 * <p>It fills in the <b>Bucket[] days</b> array</p>
+	 * <p>
+	 * It fills in the <b>Bucket[] days</b> array
+	 * </p>
 	 */
 	private void orderDays() {
 		days = new Bucket[competitors - 1];
@@ -113,8 +131,10 @@ public class Timetable {
 	}
 
 	/**
-	 * <p>Sorts Pairs in the given Bucket in such a way, 
-	 * the first half will create 1 correct day, and so as the second half</p>
+	 * <p>
+	 * Sorts Pairs in the given Bucket in such a way, the first half will create
+	 * 1 correct day, and so as the second half
+	 * </p>
 	 * 
 	 * @param b
 	 */
@@ -128,6 +148,8 @@ public class Timetable {
 		b1.add(b.bucket_pairs.get(0));
 		boolean added = false;
 		do {
+			// System.out.println(this); //tu fajnie widaæ. do wykasowania przy
+			// pomiarach
 
 			for (Pair pair : b1.bucket_pairs) {
 				temp = b.findPairByX(pair);
@@ -174,49 +196,48 @@ public class Timetable {
 		b.bucket_pairs.addAll(b2.bucket_pairs);
 
 	}
-	
-	private void orderDaysNaive(){
+
+	private void orderDaysNaive() {
 		Bucket allPairs = new Bucket();
-		for(int i = 0; i< unordered_pairs.length; i++)
+		for (int i = 0; i < unordered_pairs.length; i++)
 			allPairs.bucket_pairs.addAll(unordered_pairs[i].bucket_pairs);
-			
+
 		days = new Bucket[competitors - 1];
 		for (int i = 0; i < days.length; i++) {
 			days[i] = new Bucket();
 		}
 		int day = 0;
-		System.out.println("start!");
-		if(!orderDaysNaive(day, allPairs, days))
-			System.out.println("ERROR");
 		
-		
+		if (!orderDaysNaive(day, allPairs, days))
+			System.out.println("ERROR. answer not found");
+
 	}
-	private static int max = 0;
-	private boolean orderDaysNaive(int i, Bucket all, Bucket[] days){
-		if(i>max) {
-			System.out.println(i + " out of " + all.bucket_pairs.size());
-			max = i;
-		}
-		if(i>=all.bucket_pairs.size())
+
+	
+	private boolean orderDaysNaive(int i, Bucket all, Bucket[] days) {
+
+		// System.out.println(this); //tu fajnie widaæ. do wykasowania podczas
+		// pomiarów
+
+		if (i >= all.bucket_pairs.size())
 			return true;
 		boolean notSorted = true;
 		Pair tmp = all.bucket_pairs.get(i);
 		int j = 0;
-		
-		while(notSorted && j<days.length){
-			if(!days[j].containsCompetitor(tmp)){
+
+		while (notSorted && j < days.length) {
+			if (!days[j].containsCompetitor(tmp)) {
 				days[j].add(tmp);
-				notSorted = !orderDaysNaive(i+1, all, days);
-				if(notSorted) 
-					days[j].bucket_pairs.remove(days[j].bucket_pairs.size()-1);
+				notSorted = !orderDaysNaive(i + 1, all, days);
+				if (notSorted)
+					days[j].bucket_pairs.remove(days[j].bucket_pairs.size() - 1);
 			}
 			j++;
 		}
-		if(notSorted) return false;
+		if (notSorted)
+			return false;
 		return true;
 	}
-	
-	
 
 	@Override
 	public String toString() {
